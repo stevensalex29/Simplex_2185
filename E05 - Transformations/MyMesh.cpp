@@ -105,7 +105,7 @@ void MyMesh::CompileOpenGL3X(void)
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);//Bind the VBO
 	glBufferData(GL_ARRAY_BUFFER, m_uVertexCount * 2 * sizeof(vector3), &m_lVertex[0], GL_STATIC_DRAW);//Generate space for the VBO
 
-	// Position attribute
+																									   // Position attribute
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(vector3), (GLvoid*)0);
 
@@ -121,7 +121,7 @@ void MyMesh::Render(matrix4 a_mProjection, matrix4 a_mView, matrix4 a_mModel)
 {
 	// Use the buffer and shader
 	GLuint nShader = m_pShaderMngr->GetShaderID("Basic");
-	glUseProgram(nShader); 
+	glUseProgram(nShader);
 
 	//Bind the VAO of this object
 	glBindVertexArray(m_VAO);
@@ -133,11 +133,11 @@ void MyMesh::Render(matrix4 a_mProjection, matrix4 a_mView, matrix4 a_mModel)
 	//Final Projection of the Camera
 	matrix4 m4MVP = a_mProjection * a_mView * a_mModel;
 	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(m4MVP));
-	
+
 	//Solid
 	glUniform3f(wire, -1.0f, -1.0f, -1.0f);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glDrawArrays(GL_TRIANGLES, 0, m_uVertexCount);  
+	glDrawArrays(GL_TRIANGLES, 0, m_uVertexCount);
 
 	//Wire
 	glUniform3f(wire, 1.0f, 0.0f, 1.0f);
@@ -153,8 +153,8 @@ void MyMesh::AddTri(vector3 a_vBottomLeft, vector3 a_vBottomRight, vector3 a_vTo
 {
 	//C
 	//| \
-	//A--B
-	//This will make the triangle A->B->C 
+		//A--B
+//This will make the triangle A->B->C 
 	AddVertexPosition(a_vBottomLeft);
 	AddVertexPosition(a_vBottomRight);
 	AddVertexPosition(a_vTopLeft);
@@ -186,17 +186,17 @@ void MyMesh::GenerateCube(float a_fSize, vector3 a_v3Color)
 	//|  |
 	//0--1
 
-	vector3 point0(-fValue,-fValue, fValue); //0
-	vector3 point1( fValue,-fValue, fValue); //1
-	vector3 point2( fValue, fValue, fValue); //2
+	vector3 point0(-fValue, -fValue, fValue); //0
+	vector3 point1(fValue, -fValue, fValue); //1
+	vector3 point2(fValue, fValue, fValue); //2
 	vector3 point3(-fValue, fValue, fValue); //3
 
-	vector3 point4(-fValue,-fValue,-fValue); //4
-	vector3 point5( fValue,-fValue,-fValue); //5
-	vector3 point6( fValue, fValue,-fValue); //6
-	vector3 point7(-fValue, fValue,-fValue); //7
+	vector3 point4(-fValue, -fValue, -fValue); //4
+	vector3 point5(fValue, -fValue, -fValue); //5
+	vector3 point6(fValue, fValue, -fValue); //6
+	vector3 point7(-fValue, fValue, -fValue); //7
 
-	//F
+											  //F
 	AddQuad(point0, point1, point3, point2);
 
 	//B
@@ -237,7 +237,7 @@ void MyMesh::GenerateCuboid(vector3 a_v3Dimensions, vector3 a_v3Color)
 	vector3 point6(v3Value.x, v3Value.y, -v3Value.z); //6
 	vector3 point7(-v3Value.x, v3Value.y, -v3Value.z); //7
 
-	//F
+													   //F
 	AddQuad(point0, point1, point3, point2);
 
 	//B
@@ -275,31 +275,13 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Release();
 	Init();
 
-	// Cone creation code
-	double angStep = 2.0 * PI / a_nSubdivisions;
-	double centerX = 0.0f;
-	double centerY = 0.0f;
-	vector3 center = vector3(centerX, centerY, -a_fHeight/2);
-
-	for (int i = 0; i < a_nSubdivisions; i++)
-	{
-		// Create base triangle
-		double angle = angStep * i;
-		double x = centerX + a_fRadius * cos(angle);
-		double y = centerY + a_fRadius * sin(angle);
-
-		double angle2 = angStep * (i + 1);  // Create vertices for all sides
-		double x2 = centerX + a_fRadius * cos(angle2);
-		double y2 = centerY + a_fRadius * sin(angle2);
-
-		vector3 C = vector3(x, y, -a_fHeight / 2);
-		vector3 B = vector3(x2, y2, -a_fHeight / 2);
-		AddTri(center, C, B); // Use the center as the first point and the other new vertices as the other points
-
-		// Create side face triangle
-		vector3 D = vector3(centerX, centerY, a_fHeight/2);
-		AddTri(C,D,B);
-	}
+	// Replace this with your code
+	Mesh* pMesh = new Mesh();
+	pMesh->GenerateCone(a_fRadius, a_fHeight, a_nSubdivisions, a_v3Color);
+	m_lVertexPos = pMesh->GetVertexList();
+	m_uVertexCount = m_lVertexPos.size();
+	SafeDelete(pMesh);
+	// -------------------------------
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -321,44 +303,13 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Release();
 	Init();
 
-	// Cylinder creation code
-	double angStep = 2.0 * PI / a_nSubdivisions;
-	double centerX = 0.0f;
-	double centerY = 0.0f;
-	vector3 bottomCenter = vector3(centerX, centerY, -a_fHeight / 2);
-	vector3 topCenter = vector3(centerX, centerY, a_fHeight/2);
-
-	for (int i = 0; i < a_nSubdivisions; i++)
-	{
-		// Create triangle for bottom base
-		double bAngle = angStep * i;
-		double bottomX = centerX + a_fRadius * cos(bAngle);
-		double bottomY = centerY + a_fRadius * sin(bAngle);
-
-		double bAngle2 = angStep * (i + 1);  // Create vertices for all sides
-		double bottomX2 = centerX + a_fRadius * cos(bAngle2);
-		double bottomY2 = centerY + a_fRadius * sin(bAngle2);
-
-		vector3 bottomC = vector3(bottomX, bottomY, -a_fHeight / 2);
-		vector3 bottomB = vector3(bottomX2, bottomY2, -a_fHeight / 2);
-		AddTri(bottomB,bottomC,bottomCenter); // Use bottom center for center point at bottom
-
-		// Create triangle for top base
-		double tAngle = angStep * i;
-		double topX = centerX + a_fRadius * cos(tAngle);
-		double topY = centerY + a_fRadius * sin(tAngle);
-
-		double tAngle2 = angStep * (i + 1);  // Create vertices for all sides
-		double topX2 = centerX + a_fRadius * cos(tAngle2);
-		double topY2 = centerY + a_fRadius * sin(tAngle2);
-
-		vector3 topC = vector3(topX, topY, a_fHeight/2);
-		vector3 topB = vector3(topX2, topY2, a_fHeight/2);
-		AddTri(topCenter,topC,topB); // Use top center for center point at top
-
-		// Create side face of cylinder
-		AddQuad(bottomC,bottomB,topC,topB);
-	}
+	// Replace this with your code
+	Mesh* pMesh = new Mesh();
+	pMesh->GenerateCylinder(a_fRadius, a_fHeight, a_nSubdivisions, a_v3Color);
+	m_lVertexPos = pMesh->GetVertexList();
+	m_uVertexCount = m_lVertexPos.size();
+	SafeDelete(pMesh);
+	// -------------------------------
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -386,61 +337,13 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	Release();
 	Init();
 
-	// Tube creation code
-	double angStep = 2.0 * PI / a_nSubdivisions;
-	double centerX = 0.0f;
-	double centerY = 0.0f;
-	vector3 bottomCenter = vector3(centerX, centerY, -a_fHeight / 2);
-	vector3 topCenter = vector3(centerX, centerY, a_fHeight/2);
-
-	for (int i = 0; i < a_nSubdivisions; i++)
-	{
-		// Create quad for bottom base
-		double bAngle = angStep * i;
-		double bottomX = centerX + a_fOuterRadius * cos(bAngle);
-		double bottomY = centerY + a_fOuterRadius * sin(bAngle);
-
-		double bAngle2 = angStep * (i + 1);  // Create vertices for all sides
-		double bottomX2 = centerX + a_fOuterRadius * cos(bAngle2);
-		double bottomY2 = centerY + a_fOuterRadius * sin(bAngle2);
-
-		double bottomX3 = centerX + a_fInnerRadius * cos(bAngle);
-		double bottomY3 = centerY + a_fInnerRadius * sin(bAngle);
-
-		double bottomX4 = centerX + a_fInnerRadius * cos(bAngle2);
-		double bottomY4 = centerY + a_fInnerRadius * sin(bAngle2);
-
-		vector3 bottomC = vector3(bottomX, bottomY, -a_fHeight / 2);
-		vector3 bottomB = vector3(bottomX2, bottomY2, -a_fHeight / 2);
-		vector3 bottomD = vector3(bottomX3, bottomY3, -a_fHeight / 2);
-		vector3 bottomA = vector3(bottomX4, bottomY4, -a_fHeight / 2);
-		AddQuad(bottomA,bottomB,bottomD,bottomC); // create quad for bottom tube base
-
-		// Create quad for top base
-		double tAngle = angStep * i;
-		double topX = centerX + a_fOuterRadius * cos(tAngle);
-		double topY = centerY + a_fOuterRadius * sin(tAngle);
-
-		double tAngle2 = angStep * (i + 1);  // Create vertices for all sides
-		double topX2 = centerX + a_fOuterRadius * cos(tAngle2);
-		double topY2 = centerY + a_fOuterRadius * sin(tAngle2);
-
-		double topX3 = centerX + a_fInnerRadius * cos(tAngle);
-		double topY3 = centerY + a_fInnerRadius * sin(tAngle);
-
-		double topX4 = centerX + a_fInnerRadius * cos(tAngle2);
-		double topY4 = centerY + a_fInnerRadius * sin(tAngle2);
-
-		vector3 topC = vector3(topX, topY, a_fHeight/2);
-		vector3 topB = vector3(topX2, topY2, a_fHeight/2);
-		vector3 topD = vector3(topX3, topY3, a_fHeight/2);
-		vector3 topA = vector3(topX4, topY4, a_fHeight/2);
-		AddQuad(topA, topD, topB, topC); // create quad for top tube base
-
-		// Create side face of cylinder
-		AddQuad(bottomC, bottomB, topC, topB);
-		AddQuad(bottomA, bottomD, topA, topD);
-	}
+	// Replace this with your code
+	Mesh* pMesh = new Mesh();
+	pMesh->GenerateTube(a_fOuterRadius, a_fInnerRadius, a_fHeight, a_nSubdivisions, a_v3Color);
+	m_lVertexPos = pMesh->GetVertexList();
+	m_uVertexCount = m_lVertexPos.size();
+	SafeDelete(pMesh);
+	// -------------------------------
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -471,7 +374,11 @@ void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSu
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
+	Mesh* pMesh = new Mesh();
+	pMesh->GenerateTorus(a_fOuterRadius, a_fInnerRadius, a_nSubdivisionsA, a_nSubdivisionsB, a_v3Color);
+	m_lVertexPos = pMesh->GetVertexList();
+	m_uVertexCount = m_lVertexPos.size();
+	SafeDelete(pMesh);
 	// -------------------------------
 
 	// Adding information about color
@@ -489,71 +396,20 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		GenerateCube(a_fRadius * 2.0f, a_v3Color);
 		return;
 	}
-	if (a_nSubdivisions > 12)
-		a_nSubdivisions = 12;
+	if (a_nSubdivisions > 6)
+		a_nSubdivisions = 6;
 
 	Release();
 	Init();
 
-	// Create the sphere
-	std::vector<double> ycuts;
-	std::vector<std::vector<vector3>> rings;
-	double centerX = 0.0f;
-	double centerY = 0.0f;
-	vector3 bottomCenter = vector3(centerX, centerY, -a_fRadius);
-	vector3 topCenter = vector3(centerX, centerY, a_fRadius);
-	double angledelta = PI / (a_nSubdivisions + 1);
-	double cangle = 0;
+	// Replace this with your code
+	Mesh* pMesh = new Mesh();
+	pMesh->GenerateSphere(a_fRadius, a_nSubdivisions, a_v3Color);
+	m_lVertexPos = pMesh->GetVertexList();
+	m_uVertexCount = m_lVertexPos.size();
+	SafeDelete(pMesh);
+	// -------------------------------
 
-	// Get all of the y cuts of the sphere
-	for (int i = 0; i < a_nSubdivisions; i++) 
-	{
-		cangle += angledelta;
-		ycuts.push_back(cos(cangle) * a_fRadius);
-	}
-
-	// Build the rings of points the circle
-	for (int i = 0; i < ycuts.size(); i++) 
-	{
-		double height = ycuts[i];
-		/*double b = a_fRadius * tan(angledelta / 2);
-		double z = sqrt(b * b + a_fRadius * a_fRadius);
-		double x = 0.5 * (z - a_fRadius);*/
-		double cutradius = sqrt((a_fRadius*a_fRadius) - (height*height));
-		std::vector<vector3> r;
-		rings.push_back(r);
-		double ringangledelta = PI * 2 / a_nSubdivisions;
-		double ringangle = 0;
-		for (int k = 0; k < a_nSubdivisions; k++)  // Put the rings together
-		{
-			vector3 p = vector3(cos(ringangle)*cutradius, sin(ringangle)*cutradius, height);
-			rings[i].push_back(p);
-			ringangle += ringangledelta;
-		}
-	}
-
-	int ringSize = rings[0].size();
-
-	// Build the top of the sphere
-	for (int i = 0; i < ringSize; i++) 
-	{
-		AddTri(rings[0][i], rings[0][(i+1)%ringSize], topCenter);
-	}
-
-	// Build the center of the sphere
-	for (int i = 0; i < rings.size() - 1; i++) 
-	{
-		for (int k = 0; k < rings[i].size(); k++) {
-			AddQuad(rings[i + 1][k], rings[i + 1][(k + 1)%ringSize], rings[i][k], rings[i][(k + 1)%ringSize]);
-		}
-	}
-
-	// Build the bottom of the sphere
-	for (int i = 0; i < ringSize; i++) 
-	{
-		AddTri(rings[rings.size() - 1][i], bottomCenter, rings[rings.size() - 1][(i+1)%ringSize]);
-	}
-	
 	// Adding information about color
 	CompleteMesh(a_v3Color);
 	CompileOpenGL3X();

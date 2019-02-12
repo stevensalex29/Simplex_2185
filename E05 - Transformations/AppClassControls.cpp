@@ -100,24 +100,6 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 	case sf::Keyboard::F4:
 		m_pCameraMngr->SetCameraMode(CAM_ORTHO_X);
 		break;
-	case sf::Keyboard::F5:
-		m_pMesh->GenerateCone(1.0f, 2.0f, 10, C_CYAN);
-		break;
-	case sf::Keyboard::F6:
-		m_pMesh->GenerateCylinder(1.0f, 2.0f, 10, C_CYAN);
-		break;
-	case sf::Keyboard::F7:
-		m_pMesh->GenerateTube(1.0f, 0.7f, 1.0f, 10, C_CYAN);
-		break;
-	case sf::Keyboard::F8:
-		m_pMesh->GenerateSphere(1.0f,12, C_CYAN);
-		break;
-	case sf::Keyboard::F9:
-		m_pMesh->GenerateTorus(1.0f, 0.6f, 10, 10, C_CYAN);
-		break;
-	case sf::Keyboard::F10:
-		m_pMesh->GenerateCube(2.0f, C_CYAN);
-		break;
 	case sf::Keyboard::F:
 		bFPSControl = !bFPSControl;
 		m_pCameraMngr->SetFPS(bFPSControl);
