@@ -26,15 +26,32 @@ void Application::Display(void)
 	
 	
 	static float value = 0.0f;
-	matrix4 main = glm::translate(vector3(0.0f, 1.0f, 0.0f));
+	matrix4 main = glm::translate(vector3(0.0f, 0.0f, 0.0f));
 
 	//render all cubes
-	///*for (int i = 0; i < 46; i++) {
-	//	matrix4 m4Scale = glm::scale(main, vector3(.5f, .5f, .5f));
-	//	matrix4 m4Translate = glm::translate(main, vector3(value, 0.0f, 0.0f));
-	//	matrix4 m4Model = m4Scale * m4Translate;
-	//	m_pMesh->Render(m4Projection, m4View, m4Model);
-	//}*/
+	matrix4 m4Scale = glm::scale(main, vector3(.5f, .5f, .5f));
+	matrix4 m4Translate;
+	matrix4 m4Model;
+
+	for (int i = -5; i < 6; i++) {
+		for (int k = -3; k < 5; k++) {
+			float yval = k * 1.0f;
+			float xval = i * 1.0f;
+			//continue if not a cube at this position
+			if ((i == -5 || i == 5) && (k == -3 || k == 1 || k == 2 || k == 3 || k == 4))continue;
+			if ((i == -4 || i == 4) && (k == -3 || k == -2 || k == -1 || k == 2 || k == 3 || k == 4))continue;
+			if ((i == -3 || i == 3) && (k == -3 || k == 3))continue;
+			if ((i == -2 || i == 2) && (k == -2 || k == 1 || k == 4))continue;
+			if ((i == -1 || i == 1) && (k == -2 || k == 3 || k == 4))continue;
+			if (i == 0 && (k == -3 || k == -2 || k == 3 || k == 4))continue;
+
+			// render the cube at this position
+			m4Translate = glm::translate(main, vector3(xval+value, yval, 0.0f));
+			m4Model = m4Scale * m4Translate;
+			m_pMesh->Render(m4Projection, m4View, m4Model);
+		}
+	}
+	
 
 	
 	// draw a skybox
