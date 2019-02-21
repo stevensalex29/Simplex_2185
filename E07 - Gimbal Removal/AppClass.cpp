@@ -24,15 +24,26 @@ void Application::Display(void)
 
 	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
 	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
-
-	m_m4Model = glm::rotate(IDENTITY_M4, glm::radians(m_v3Rotation.x), vector3(1.0f, 0.0f, 0.0f));
-	m_m4Model = glm::rotate(m_m4Model, glm::radians(m_v3Rotation.y), vector3(0.0f, 1.0f, 0.0f));
-	m_m4Model = glm::rotate(m_m4Model, glm::radians(m_v3Rotation.z), vector3(0.0f, 0.0f, 1.0f));
-	m_pMesh->Render(m4Projection, m4View, ToMatrix4(m_m4Model));
-
-	//m_qOrientation = m_qOrientation * glm::angleAxis(glm::radians(1.0f), vector3(1.0f));
-	//m_pMesh->Render(m4Projection, m4View, ToMatrix4(m_qOrientation));
 	
+	// get the pitch, yaw, and roll from the rotations on the their respective axises
+	glm::quat qPitch = glm::angleAxis(glm::radians(m_v3Rotation.x), AXIS_X);
+	glm::quat qYaw = glm::angleAxis(glm::radians(m_v3Rotation.y), AXIS_Y);
+	glm::quat qRoll = glm::angleAxis(glm::radians(m_v3Rotation.z),AXIS_Z);
+	glm::quat orientation = qRoll * qYaw * qPitch;
+
+	// reset values 
+	m_v3Rotation.y = 0.0f;
+	m_v3Rotation.x = 0.0f;
+	m_v3Rotation.z = 0.0f;
+
+	// update orientation (multiply old orientation by new orientation)
+	m_qOrientation = orientation * m_qOrientation;
+	m_qOrientation = glm::normalize(m_qOrientation);
+
+	// use orientation matrix since no translations are taking place
+	m_pMesh->Render(m4Projection, m4View, ToMatrix4(m_qOrientation));
+	
+
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
 	
