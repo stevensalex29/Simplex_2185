@@ -37,7 +37,7 @@ void Application::Display(void)
 	m_v3Rotation.z = 0.0f;
 
 	// update orientation (multiply old orientation by new orientation)
-	m_qOrientation = orientation * m_qOrientation;
+	m_qOrientation = m_qOrientation * orientation;
 	m_qOrientation = glm::normalize(m_qOrientation);
 
 	// use orientation matrix since no translations are taking place
