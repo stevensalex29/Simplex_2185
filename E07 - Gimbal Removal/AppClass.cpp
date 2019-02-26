@@ -1,6 +1,11 @@
 #include "AppClass.h"
 void Application::InitVariables(void)
 {
+	m_pCameraMngr->SetPositionTargetAndUpward(
+		vector3(0.0f, 0.0f, 7.0f),
+		vector3(0.0f, 0.0f, 0.0f),
+		vector3(0.0f, 1.0f, 7.0f)
+	);
 	//init the mesh
 	m_pMesh = new MyMesh();
 	//m_pMesh->GenerateCube(1.0f, C_WHITE);
@@ -22,8 +27,16 @@ void Application::Display(void)
 	// Clear the screen
 	ClearScreen();
 
-	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
-	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
+	
+	float fAspect = m_pSystem->GetWindowWidth() / static_cast<float>(m_pSystem->GetWindowHeight());
+	float fNear = 0.01;
+	float fFar = 6.5f; //how far from camera can see, start point is near, end point is far
+	matrix4 m4Projection = glm::perspective(m_ffOV,fAspect,fNear,fFar);
+	vector3 v3Target = m_v3Eye + vector3(0.0f, 0.0f, -1.0f);//what am i looking at
+	vector3 v3Upward = vector3(0.0f,1.0f,0.0f);//what up means
+	matrix4 m4View = glm::lookAt(m_v3Eye,v3Target,v3Upward);
+
+	//m4Projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, fNear, fFar);
 	
 	// get the pitch, yaw, and roll from the rotations on the their respective axises
 	glm::quat qPitch = glm::angleAxis(glm::radians(m_v3Rotation.x), AXIS_X);

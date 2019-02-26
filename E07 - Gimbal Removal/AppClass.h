@@ -14,7 +14,9 @@ Date: 2017/05
 
 class Application
 {
+	float m_ffOV = 45.0f;
 	matrix4 m_m4Model = IDENTITY_M4;
+	vector3 m_v3Eye = vector3(0.0f, 0.0f, 5.0f);
 	quaternion m_qOrientation;
 	vector3 m_v3Rotation;
 	MyMesh* m_pMesh = nullptr;
