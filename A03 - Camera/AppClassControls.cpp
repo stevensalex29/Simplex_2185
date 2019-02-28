@@ -369,6 +369,14 @@ void Application::CameraRotation(float a_fSpeed)
 		fAngleX += fDeltaMouse * a_fSpeed;
 	}
 	//Change the Yaw and the Pitch of the camera
+	glm::quat qPitch = glm::angleAxis(glm::radians(-fAngleX), AXIS_X);
+	glm::quat qYaw = glm::angleAxis(glm::radians(fAngleY), AXIS_Y);
+	glm::quat orientation = qYaw * qPitch;
+	//Set new orientation of camera
+	m_pCamera->SetOrientation(m_pCamera->GetOrientation() * orientation);
+	//Set new forward of camera
+	m_pCamera->SetTarget(m_pCamera->GetPosition() + glm::rotate(m_pCamera->GetOrientation(), AXIS_X));
+	m_pCamera->SetAbove(m_pCamera->GetPosition() + glm::rotate(m_pCamera->GetOrientation(), AXIS_Y));
 	SetCursorPos(CenterX, CenterY);//Position the mouse in the center
 }
 //Keyboard
@@ -385,11 +393,29 @@ void Application::ProcessKeyboard(void)
 
 	if (fMultiplier)
 		fSpeed *= 5.0f;
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+	// Update camera position based on WASD
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) { // Move forward
 		m_pCamera->MoveForward(fSpeed);
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) { // Move backward
 		m_pCamera->MoveForward(-fSpeed);
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) { // Move left
+		m_pCamera->MoveSideways(-fSpeed);
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) { // Move right
+		m_pCamera->MoveSideways(fSpeed);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) { // Move up
+		m_pCamera->MoveVertical(fSpeed);
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) { // Move down
+		m_pCamera->MoveVertical(-fSpeed);
+	}
 #pragma endregion
 }
 //Joystick

@@ -98,11 +98,22 @@ Simplex::MyCamera::~MyCamera(void)
 	Release();
 }
 
+glm::quat Simplex::MyCamera::GetOrientation(void)
+{
+	return m_qOrientation;
+}
+
+void Simplex::MyCamera::SetOrientation(glm::quat a_qOrientation)
+{
+	m_qOrientation = a_qOrientation;
+}
+
 void Simplex::MyCamera::ResetCamera(void)
 {
 	m_v3Position = vector3(0.0f, 0.0f, 10.0f); //Where my camera is located
 	m_v3Target = vector3(0.0f, 0.0f, 0.0f); //What I'm looking at
 	m_v3Above = vector3(0.0f, 1.0f, 0.0f); //What is above the camera
+	m_qOrientation = quaternion();
 
 	m_bPerspective = true; //perspective view? False is Orthographic
 
@@ -152,11 +163,29 @@ void Simplex::MyCamera::CalculateProjectionMatrix(void)
 
 void MyCamera::MoveForward(float a_fDistance)
 {
-	//The following is just an example and does not take in account the forward vector (AKA view vector)
-	m_v3Position += vector3(0.0f, 0.0f,-a_fDistance);
-	m_v3Target += vector3(0.0f, 0.0f, -a_fDistance);
-	m_v3Above += vector3(0.0f, 0.0f, -a_fDistance);
+	//Calculate the forward vector from target - position, then update other vectors
+	vector3 forward = m_v3Target - m_v3Position;
+	
+	m_v3Position += forward * a_fDistance;
+	m_v3Target += forward * a_fDistance;
+	m_v3Above += forward * a_fDistance;
 }
 
-void MyCamera::MoveVertical(float a_fDistance){}//Needs to be defined
-void MyCamera::MoveSideways(float a_fDistance){}//Needs to be defined
+void MyCamera::MoveVertical(float a_fDistance)
+{
+	//Calculate the forward vector from above - position, then update other vectors
+	vector3 forward = m_v3Above - m_v3Position;
+
+	m_v3Position += forward * a_fDistance;
+	m_v3Target += forward * a_fDistance;
+	m_v3Above += forward * a_fDistance;
+}
+void MyCamera::MoveSideways(float a_fDistance)
+{
+	//Calculate the forward vector from cross of target and above (left side), then update other vectors
+	vector3 forward = glm::cross(m_v3Target - m_v3Position,m_v3Above - m_v3Position);
+
+	m_v3Position += forward * a_fDistance;
+	m_v3Target += forward * a_fDistance;
+	m_v3Above += forward * a_fDistance;
+}

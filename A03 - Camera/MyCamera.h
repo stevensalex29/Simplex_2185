@@ -15,6 +15,7 @@ class MyCamera
 	vector3 m_v3Position = vector3(0.0f, 0.0f, 10.0f); //Where my camera is located
 	vector3 m_v3Target = vector3(0.0f, 0.0f, 0.0f); //What I'm looking at
 	vector3 m_v3Above = vector3(0.0f, 1.0f, 0.0f); //What is above the camera
+	quaternion m_qOrientation; // Orientation of camera
 
 	bool m_bPerspective = true; //perspective view? False is Orthographic
 
@@ -87,6 +88,20 @@ public:
 	OUTPUT: ---
 	*/
 	~MyCamera(void);
+
+	/*
+	USAGE: Gets the orientation quaternion of the camera
+	ARGUMENTS: ---
+	OUTPUT: orientation of camera
+	*/
+	glm::quat GetOrientation(void);
+
+	/*
+	USAGE: Sets the orientation quaternion of the camera
+	ARGUMENTS: quaternion a_qOrientation -> The orientation of the camera
+	OUTPUT: ---
+	*/
+	void SetOrientation(glm::quat a_qOrientation);
 
 	/*
 	USAGE: Sets the position of the camera

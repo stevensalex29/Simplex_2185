@@ -63,6 +63,15 @@ void MyRigidBody::Release(void)
 MyRigidBody::MyRigidBody(std::vector<vector3> a_pointList)
 {
 	Init();
+
+	m_v3MaxG = m_v3MaxL = vector3(3.0f);
+	m_v3MinG = m_v3MinL = vector3(-3.0f);
+	m_v3Center = vector3(0.0f);
+
+	m_fRadius = glm::distance(m_v3Center, m_v3MaxL);
+
+
+	m_v3HalfWidth = (m_v3MaxL - m_v3MinL) / 2.0f;
 }
 MyRigidBody::MyRigidBody(MyRigidBody const& other)
 {
@@ -100,8 +109,10 @@ MyRigidBody::~MyRigidBody(){Release();};
 //--- Non Standard Singleton Methods
 void MyRigidBody::AddToRenderList(void)
 {
-	if (!m_bVisible)
+	//if (!m_bVisible)
+		m_pMeshMngr->AddWireSphereToRenderList(glm::scale(IDENTITY_M4,vector3(m_fRadius)), m_v3Color);
 		return;
+		
 }
 bool MyRigidBody::IsColliding(MyRigidBody* const other)
 {
