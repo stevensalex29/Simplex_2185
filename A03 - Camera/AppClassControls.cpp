@@ -332,6 +332,10 @@ void Application::CameraRotation(float a_fSpeed)
 
 	UINT	MouseX, MouseY;		// Coordinates for the mouse
 	UINT	CenterX, CenterY;	// Coordinates for the center of the screen.
+	// Rotation values
+	float fAngleX = 0.0f;
+	float fAngleY = 0.0f;
+
 
 								//Initialize the position of the pointer to the middle of the screen
 	CenterX = m_pSystem->GetWindowX() + m_pSystem->GetWindowWidth() / 2;
@@ -344,8 +348,7 @@ void Application::CameraRotation(float a_fSpeed)
 	MouseY = pt.y;
 
 	//Calculate the difference in view with the angle
-	float fAngleX = 0.0f;
-	float fAngleY = 0.0f;
+
 	float fDeltaMouse = 0.0f;
 	if (MouseX < CenterX)
 	{
@@ -368,15 +371,10 @@ void Application::CameraRotation(float a_fSpeed)
 		fDeltaMouse = static_cast<float>(MouseY - CenterY);
 		fAngleX += fDeltaMouse * a_fSpeed;
 	}
-	//Change the Yaw and the Pitch of the camera
-	glm::quat qPitch = glm::angleAxis(glm::radians(-fAngleX), AXIS_X);
-	glm::quat qYaw = glm::angleAxis(glm::radians(fAngleY), AXIS_Y);
-	glm::quat orientation = qYaw * qPitch;
-	//Set new orientation of camera
-	m_pCamera->SetOrientation(m_pCamera->GetOrientation() * orientation);
-	//Set new forward of camera
-	m_pCamera->SetTarget(m_pCamera->GetPosition() + glm::rotate(m_pCamera->GetOrientation(), AXIS_X));
-	m_pCamera->SetAbove(m_pCamera->GetPosition() + glm::rotate(m_pCamera->GetOrientation(), AXIS_Y));
+	
+	//Rotate the camera based on mouse movement
+	m_pCamera->rotateCamera(fAngleX, fAngleY);
+
 	SetCursorPos(CenterX, CenterY);//Position the mouse in the center
 }
 //Keyboard

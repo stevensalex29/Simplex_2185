@@ -98,6 +98,19 @@ Simplex::MyCamera::~MyCamera(void)
 	Release();
 }
 
+void Simplex::MyCamera::rotateCamera(float fAngleX, float fAngleY)
+{
+	//Set new pitch and yaw of camera
+	SetPitch(glm::angleAxis(glm::radians(-fAngleX), AXIS_X));
+	SetYaw(glm::angleAxis(glm::radians(fAngleY), AXIS_Y));
+	//Update orientation based on new yaw and pitch
+	SetOrientation(GetOrientation() * GetYaw() * GetPitch());
+	//Set new target of camera
+	SetTarget(GetPosition() + glm::rotate(GetOrientation(), -AXIS_Z));
+	//Calculate new updated view matrix
+	CalculateViewMatrix();
+}
+
 glm::quat Simplex::MyCamera::GetOrientation(void)
 {
 	return m_qOrientation;
@@ -106,6 +119,26 @@ glm::quat Simplex::MyCamera::GetOrientation(void)
 void Simplex::MyCamera::SetOrientation(glm::quat a_qOrientation)
 {
 	m_qOrientation = a_qOrientation;
+}
+
+glm::quat Simplex::MyCamera::GetYaw(void)
+{
+	return m_qYaw;
+}
+
+void Simplex::MyCamera::SetYaw(glm::quat a_qYaw)
+{
+	m_qYaw = a_qYaw;
+}
+
+glm::quat Simplex::MyCamera::GetPitch(void)
+{
+	return m_qPitch;
+}
+
+void Simplex::MyCamera::SetPitch(glm::quat a_qPitch)
+{
+	m_qPitch = a_qPitch;
 }
 
 void Simplex::MyCamera::ResetCamera(void)
@@ -165,6 +198,7 @@ void MyCamera::MoveForward(float a_fDistance)
 {
 	//Calculate the forward vector from target - position, then update other vectors
 	vector3 forward = m_v3Target - m_v3Position;
+	forward = glm::normalize(forward);
 	
 	m_v3Position += forward * a_fDistance;
 	m_v3Target += forward * a_fDistance;
@@ -175,6 +209,7 @@ void MyCamera::MoveVertical(float a_fDistance)
 {
 	//Calculate the forward vector from above - position, then update other vectors
 	vector3 forward = m_v3Above - m_v3Position;
+	forward = glm::normalize(forward);
 
 	m_v3Position += forward * a_fDistance;
 	m_v3Target += forward * a_fDistance;
@@ -184,6 +219,7 @@ void MyCamera::MoveSideways(float a_fDistance)
 {
 	//Calculate the forward vector from cross of target and above (left side), then update other vectors
 	vector3 forward = glm::cross(m_v3Target - m_v3Position,m_v3Above - m_v3Position);
+	forward = glm::normalize(forward);
 
 	m_v3Position += forward * a_fDistance;
 	m_v3Target += forward * a_fDistance;

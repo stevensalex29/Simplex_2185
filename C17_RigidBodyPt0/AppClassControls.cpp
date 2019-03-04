@@ -336,6 +336,9 @@ void Application::ArcBall(float a_fSensitivity)
 		m_qArcBall = quaternion(vector3(glm::radians(a_fSensitivity * DeltaMouse), 0.0f, 0.0f)) * m_qArcBall;
 	}
 
+
+
+
 	SetCursorPos(CenterX, CenterY);//Position the mouse in the center
 								   //return qArcBall; // return the new quaternion orientation
 }
@@ -383,8 +386,10 @@ void Application::CameraRotation(float a_fSpeed)
 		fAngleX += fDeltaMouse * a_fSpeed;
 	}
 	//Change the Yaw and the Pitch of the camera
-	m_pCameraMngr->ChangeYaw(fAngleY * 0.25f);
-	m_pCameraMngr->ChangePitch(-fAngleX * 0.25f);
+	//m_pCameraMngr->ChangeYaw(fAngleY * 0.25f);
+	//m_pCameraMngr->ChangePitch(-fAngleX * 0.25f);
+
+	m_pCameraMngr->SetPosition(glm::vec3(a_fSpeed+cos(fAngleY), a_fSpeed+sin(-fAngleX), a_fSpeed+(fAngleY)));
 	SetCursorPos(CenterX, CenterY);//Position the mouse in the center
 }
 //Keyboard

@@ -15,7 +15,9 @@ class MyCamera
 	vector3 m_v3Position = vector3(0.0f, 0.0f, 10.0f); //Where my camera is located
 	vector3 m_v3Target = vector3(0.0f, 0.0f, 0.0f); //What I'm looking at
 	vector3 m_v3Above = vector3(0.0f, 1.0f, 0.0f); //What is above the camera
-	quaternion m_qOrientation; // Orientation of camera
+	quaternion m_qOrientation; // Orientation quaternion of camera
+	glm::quat m_qPitch; // Pitch quaternion of the camera
+	glm::quat m_qYaw; // Yaw quaternion of the camera
 
 	bool m_bPerspective = true; //perspective view? False is Orthographic
 
@@ -29,6 +31,8 @@ class MyCamera
 
 	matrix4 m_m4View; //View matrix
 	matrix4 m_m4Projection; //Projection Matrix
+
+
 public:
 	/*
 	USAGE: Constructor
@@ -90,6 +94,13 @@ public:
 	~MyCamera(void);
 
 	/*
+	USAGE: Rotate the camera based on mouse movement
+	ARGUMENTS: float fAngleX -> x angle of movement, float fAngleY -> y angle of movement
+	OUTPUT: ---
+	*/
+	void rotateCamera(float fAngleX, float fAngleY);
+
+	/*
 	USAGE: Gets the orientation quaternion of the camera
 	ARGUMENTS: ---
 	OUTPUT: orientation of camera
@@ -102,6 +113,34 @@ public:
 	OUTPUT: ---
 	*/
 	void SetOrientation(glm::quat a_qOrientation);
+
+	/*
+	USAGE: Gets the Yaw quaternion of the camera
+	ARGUMENTS: ---
+	OUTPUT: yaw of camera
+	*/
+	glm::quat GetYaw(void);
+
+	/*
+	USAGE: Sets the yaw quaternion of the camera
+	ARGUMENTS: quaternion a_qYaw -> The yaw of the camera
+	OUTPUT: ---
+	*/
+	void SetYaw(glm::quat a_qYaw);
+
+	/*
+	USAGE: Gets the Pitch quaternion of the camera
+	ARGUMENTS: ---
+	OUTPUT: pitch of camera
+	*/
+	glm::quat GetPitch(void);
+
+	/*
+	USAGE: Sets the pitch quaternion of the camera
+	ARGUMENTS: quaternion a_qPitch -> The pitch of the camera
+	OUTPUT: ---
+	*/
+	void SetPitch(glm::quat a_qPitch);
 
 	/*
 	USAGE: Sets the position of the camera
