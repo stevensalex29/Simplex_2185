@@ -85,8 +85,25 @@ void MyRigidBody::SetModelMatrix(matrix4 a_m4ModelMatrix)
 	m_m4ToWorld = a_m4ModelMatrix;
 	
 	//your code goes here---------------------
-	m_v3MinG = m_v3MinL;
-	m_v3MaxG = m_v3MaxL;
+	std::vector<vector3> lPoints; //add local points of bounding box to a vector
+	lPoints.push_back(vector3(m_v3MinL.x, m_v3MinL.y, m_v3MinL.z)); //bottom left corner (front points)
+	lPoints.push_back(vector3(m_v3MaxL.x, m_v3MinL.y, m_v3MinL.z)); //bottom right corner
+	lPoints.push_back(vector3(m_v3MinL.x, m_v3MaxL.y, m_v3MinL.z)); //top left corner
+	lPoints.push_back(vector3(m_v3MaxL.x, m_v3MaxL.y, m_v3MinL.z)); //top right corner
+	lPoints.push_back(vector3(m_v3MinL.x, m_v3MinL.y, m_v3MaxL.z)); //same for the rest (back points)
+	lPoints.push_back(vector3(m_v3MaxL.x, m_v3MinL.y, m_v3MaxL.z));
+	lPoints.push_back(vector3(m_v3MinL.x, m_v3MaxL.y, m_v3MaxL.z));
+	lPoints.push_back(vector3(m_v3MaxL.x, m_v3MaxL.y, m_v3MaxL.z));
+
+	//change local points to global, multiply by rotation matrix
+	for (uint i = 0; i < lPoints.size(); i++) {
+		lPoints[i] = static_cast<vector3>(m_m4ToWorld * vector4(lPoints[i], 1.0f));
+	}
+
+	//update global min and max based off data
+	MyRigidBody temp(lPoints);
+	m_v3MinG = temp.m_v3MinG;
+	m_v3MaxG = temp.m_v3MaxG;
 	//----------------------------------------
 
 	//we calculate the distance between min and max vectors
