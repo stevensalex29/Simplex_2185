@@ -279,26 +279,26 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	float ra, rb;
 	matrix3 R, AbsR;
 
-	// Keep track of the orientation of both and the halfwidth of both
+	// Keep track of the orientation and halfwidth of both OOBs
 	matrix3 orientation1 = static_cast<matrix3>(this->GetModelMatrix());
 	matrix3 orientation2 = static_cast<matrix3>(a_pOther->GetModelMatrix());
 	vector3 halfwidth1 = this->GetHalfWidth();
 	vector3 halfwidth2 = a_pOther->GetHalfWidth();
 
-	// Compute the rotation matrix to express b in a’s coordinate space
+	// Compute the rotation matrix to express a_pOther in the current rigidbody's coordinate space
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
 			R[i][j] = glm::dot(orientation1[i], orientation2[j]);
 		}	
 	}
 		
-	// Compute the translation vector using the center points of the OOBs
+	// Compute the translation vector using the center points of the rigidbodies
 	vector3 t = a_pOther->GetCenterGlobal() - this->GetCenterGlobal();
 
-	// Bring the translation into b's coordinate space
+	// Bring the translation into a_pOther's coordinate space
 	t = vector3(glm::dot(t, orientation1[0]), glm::dot(t, orientation1[1]), glm::dot(t, orientation1[2]));
 
-	// Calculate the common subexpressions. Add an epsilon to prevent arithmetic errors 
+	// Calculate the common subexpressions of the rigidbodies. Add an epsilon to prevent arithmetic errors 
 	// (Happens when two edges are parallel, cross product might be near null)
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
@@ -307,6 +307,7 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	}
 
 	// Begin checking for axis that separates two objects, return 1 if one is found (no collision)
+	// A represents the current object, B represents a_pOther 
 	// Check Ax, Ay, and Az axises
 	for (int i = 0; i < 3; i++) {
 		ra = halfwidth1[i];
@@ -319,39 +320,39 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 		rb = halfwidth2[i];
 		if (abs(t[0] * R[0][i] + t[1] * R[1][i] + t[2] * R[2][i]) > ra + rb) return 1;
 	}
-	// Check axis A0 x B0
+	// Check axis A0 x B0 (cross product)
 	ra = halfwidth1[1] * AbsR[2][0] + halfwidth1[2] * AbsR[1][0];
 	rb = halfwidth2[1] * AbsR[0][2] + halfwidth2[2] * AbsR[0][1];
 	if (abs(t[2] * R[1][0] - t[1] * R[2][0]) > ra + rb) return 1;
-	// Check axis A0 x B1
+	// Check axis A0 x B1 (cross product)
 	ra = halfwidth1[1] * AbsR[2][1] + halfwidth1[2] * AbsR[1][1];
 	rb = halfwidth2[0] * AbsR[0][2] + halfwidth2[2] * AbsR[0][0];
 	if (abs(t[2] * R[1][1] - t[1] * R[2][1]) > ra + rb) return 1;
-	// Check axis A0 x B2
+	// Check axis A0 x B2 (cross product)
 	ra = halfwidth1[1] * AbsR[2][2] + halfwidth1[2] * AbsR[1][2];
 	rb = halfwidth2[0] * AbsR[0][1] + halfwidth2[1] * AbsR[0][0];
 	if (abs(t[2] * R[1][2] - t[1] * R[2][2]) > ra + rb) return 1;
-	// Check axis A1 x B0
+	// Check axis A1 x B0 (cross product)
 	ra = halfwidth1[0] * AbsR[2][0] + halfwidth1[2] * AbsR[0][0];
 	rb = halfwidth2[1] * AbsR[1][2] + halfwidth2[2] * AbsR[1][1];
 	if (abs(t[0] * R[2][0] - t[2] * R[0][0]) > ra + rb) return 1;
-	// Check axis A1 x B1
+	// Check axis A1 x B1 (cross product)
 	ra = halfwidth1[0] * AbsR[2][1] + halfwidth1[2] * AbsR[0][1];
 	rb = halfwidth2[0] * AbsR[1][2] + halfwidth2[2] * AbsR[1][0];
 	if (abs(t[0] * R[2][1] - t[2] * R[0][1]) > ra + rb) return 1;
-	// Check axis A1 x B2
+	// Check axis A1 x B2 (cross product)
 	ra = halfwidth1[0] * AbsR[2][2] + halfwidth1[2] * AbsR[0][2];
 	rb = halfwidth2[0] * AbsR[1][1] + halfwidth2[1] * AbsR[1][0];
 	if (abs(t[0] * R[2][2] - t[2] * R[0][2]) > ra + rb) return 1;
-	// Check axis A2 x B0
+	// Check axis A2 x B0 (cross product)
 	ra = halfwidth1[0] * AbsR[1][0] + halfwidth1[1] * AbsR[0][0];
 	rb = halfwidth2[1] * AbsR[2][2] + halfwidth2[2] * AbsR[2][1];
 	if (abs(t[1] * R[0][0] - t[0] * R[1][0]) > ra + rb) return 1;
-	// Check axis A2 x B1
+	// Check axis A2 x B1 (cross product)
 	ra = halfwidth1[0] * AbsR[1][1] + halfwidth1[1] * AbsR[0][1];
 	rb = halfwidth2[0] * AbsR[2][2] + halfwidth2[2] * AbsR[2][0];
 	if (abs(t[1] * R[0][1] - t[0] * R[1][1]) > ra + rb) return 1;
-	// Check axis A2 x B2
+	// Check axis A2 x B2 (cross product)
 	ra = halfwidth1[0] * AbsR[1][2] + halfwidth1[1] * AbsR[0][2];
 	rb = halfwidth2[0] * AbsR[2][1] + halfwidth2[1] * AbsR[2][0];
 	if (abs(t[1] * R[0][2] - t[0] * R[1][2]) > ra + rb) return 1;
